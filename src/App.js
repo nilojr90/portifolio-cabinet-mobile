@@ -20,62 +20,84 @@ export default function App() {
       if (response.status === 200) {
         setProjects(response.data);
       }
-      console.log(projects);
+      console.log("Load projects");
+      projects.map(project => console.log(project));
     });
   }, []);
 
   async function handleLikeRepository(id) {
     // Implement "Like Repository" functionality
     console.log(`Like project: ${id}`);
+    const response = await api.post(`repositories/${id}/like`);
+
+    if (response.status === 200) {
+      const index = projects.findIndex(project => 
+        project.id === id
+      );
+      projects[index].likes = response.data.likes;
+
+      setProjects([...projects]);
+    }
   }
 
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor="#7159c1" />
-      <FlatList
-        style={styles.container}
-        data={projects}
-        keyExtractor={(project) => project.id}
-        renderItem={({ item: project }) => (
-          <>
-            <View style={styles.repositoryContainer}>
-              <Text style={styles.repository}>{project.title}</Text>
+      <SafeAreaView style={styles.background}>
+        <Text style={styles.text}>Projetos</Text>
+        <FlatList
+          style={styles.container}
+          data={projects}
+          keyExtractor={(project) => project.id}
+          renderItem={({ item: project }) => (
+            <> 
+              <View style={styles.repositoryContainer}>
+                <Text style={styles.repository}>{project.title}</Text>
 
-              <View style={styles.techsContainer}>
-                <>
-                  {project.techs.map((tech) => {
-                    return <Text style={styles.tech}>{tech}</Text>;
-                  })}
-                </>
-              </View>
+                <View style={styles.techsContainer}>
+                  <>
+                    {project.techs.map((tech) => {
+                      return (
+                        <Text key={tech} style={styles.tech}>
+                          {tech}
+                        </Text>
+                      );
+                    })}
+                  </>
+                </View>
 
-              <View style={styles.likesContainer}>
-                <Text
-                  style={styles.likeText}
-                  // Remember to replace "1" below with repository ID: {`repository-likes-${repository.id}`}
-                  testID={`repository-likes-${project.likes}`}
+                <View style={styles.likesContainer}>
+                  <Text
+                    style={styles.likeText}
+                    // Remember to replace "1" below with repository ID: {`repository-likes-${repository.id}`}
+                    testID={`repository-likes-${project.id}`}
+                  >
+                    {`${project.likes} ${project.likes <2 ? "curtida" : "curtidas"}`}
+                  </Text>
+                </View>
+
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => handleLikeRepository(project.id)}
+                  // Remember to replace "1" below with repository ID: {`like-button-${repository.id}`}
+                  testID={`like-button-${project.id}`}
                 >
-                  {`${project.likes} curtidas`}
-                </Text>
+                  <Text style={styles.buttonText}>Curtir</Text>
+                </TouchableOpacity>
               </View>
-
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => handleLikeRepository(project.id)}
-                // Remember to replace "1" below with repository ID: {`like-button-${repository.id}`}
-                testID={`like-button-${project.id}`}
-              >
-                <Text style={styles.buttonText}>Curtir</Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        )}
-      ></FlatList>
+            </>
+          )}
+        ></FlatList>
+      </SafeAreaView>
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    backgroundColor: "#7159c1",
+  },
   container: {
     flex: 1,
     backgroundColor: "#7159c1",
@@ -112,6 +134,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     marginRight: 10,
+  },
+  text: {
+    fontSize: 14,
+    fontWeight: "bold",
+    margin: 8,
+    alignSelf: "center",
+    color: "#eef",
   },
   button: {
     marginTop: 10,
