@@ -49,20 +49,23 @@ export default function App() {
           style={styles.container}
           data={projects}
           keyExtractor={(project) => project.id}
-          renderItem={({ item: project }) => (
+          renderItem={({ item: project }) => {
+            const{id,title,techs,likes} = project;
+          return (
             <> 
               <View style={styles.repositoryContainer}>
-                <Text style={styles.repository}>{project.title}</Text>
+                <Text style={styles.repository}>{title}</Text>
 
                 <View style={styles.techsContainer}>
                   <>
-                    {project.techs.map((tech) => {
-                      return (
-                        <Text key={tech} style={styles.tech}>
+                    {techs.map((tech) =>(
+                        <Text 
+                        key={tech} 
+                        style={styles.tech}
+                        >
                           {tech}
                         </Text>
-                      );
-                    })}
+                      ))}
                   </>
                 </View>
 
@@ -70,23 +73,23 @@ export default function App() {
                   <Text
                     style={styles.likeText}
                     // Remember to replace "1" below with repository ID: {`repository-likes-${repository.id}`}
-                    testID={`repository-likes-${project.id}`}
+                    testID={`repository-likes-${id}`}
                   >
-                    {`${project.likes} ${project.likes <2 ? "curtida" : "curtidas"}`}
+                    {`${likes} ${likes <2 ? "curtida" : "curtidas"}`}
                   </Text>
                 </View>
 
                 <TouchableOpacity
                   style={styles.button}
-                  onPress={() => handleLikeRepository(project.id)}
+                  onPress={() => handleLikeRepository(id)}
                   // Remember to replace "1" below with repository ID: {`like-button-${repository.id}`}
-                  testID={`like-button-${project.id}`}
+                  testID={`like-button-${id}`}
                 >
                   <Text style={styles.buttonText}>Curtir</Text>
                 </TouchableOpacity>
               </View>
             </>
-          )}
+          )}}
         ></FlatList>
       </SafeAreaView>
     </>
